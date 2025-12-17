@@ -7,7 +7,7 @@ print("Home Automation System Starting...")
 try:
     while True:
         motion = read_pir()
-        light = read_ldr()
+        light =read_ldr()
         temp, hum = read_dht()
 
         data = {
@@ -21,11 +21,15 @@ try:
         if motion and not light:
             print("Motion detected in dark environment. Turning light ON.")
             turn_light_on()
+        
+        # elif light:
+        #     print("Environment is bright. Turning light OFF.")
+        #     turn_light_off()
         else:
             print("No motion or sufficient light. Turning light OFF.")
             turn_light_off()
 
-        time.sleep(3)
+        time.sleep(2)
 
 except KeyboardInterrupt:
     cleanup()

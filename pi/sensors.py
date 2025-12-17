@@ -1,12 +1,13 @@
 import RPi.GPIO as GPIO
-import Adafruit_DHT
+import board
+import adafruit_dht
 
 # GPIO pin
 PIR_PIN = 6
-DHT_PIN = 4
+#DHT_PIN = 4
 LDR_PIN = 24
 
-DHT_SENSOR = Adafruit_DHT.DHT22
+dhtDevice = adafruit_dht.DHT22(board.D4)
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(PIR_PIN, GPIO.IN)
@@ -22,8 +23,10 @@ def read_ldr():
     """Read the LDR sensor state."""
     return GPIO.input(LDR_PIN)
 
-
 def read_dht():
-    """Read the DHT22 sensor for temperature and humidity."""
-    humidity, temperature = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
-    return humidity, temperature
+    try:
+        temperature = dhtDevice.temperature
+        humidity = dhtDevice.humidity
+        return temperature, humidity
+    except RuntimeError:
+        return None, None
