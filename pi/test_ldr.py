@@ -1,19 +1,19 @@
 import RPi.GPIO as GPIO
 import time
 
-PIR_PIN = 6
+LDR_PIN = 24  
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(PIR_PIN, GPIO.IN)
+GPIO.setup(LDR_PIN, GPIO.IN)
 
-print("PIR sensor test started")
+print("LDR test started")
 
 try:
     while True:
-        if GPIO.input(PIR_PIN):
-            print("Motion detected!")
+        if GPIO.input(LDR_PIN):
+            print("Bright")
         else:
-            print("No motion")
+            print("Dark")
         time.sleep(1)
 
 except KeyboardInterrupt:
