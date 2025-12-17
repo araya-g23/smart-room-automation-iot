@@ -10,11 +10,11 @@ print("Relay test running... Press CTRL+C to stop.")
 
 try:
     while True:
-        GPIO.output(RELAY_PIN, GPIO.LOW)
+        GPIO.output(RELAY_PIN, GPIO.HIGH)
         print("Relay ON - LED should be ON")
         time.sleep(2)
 
-        GPIO.output(RELAY_PIN, GPIO.HIGH)
+        GPIO.output(RELAY_PIN, GPIO.LOW)
         print("Relay OFF - LED should be OFF")
         time.sleep(2)
 
