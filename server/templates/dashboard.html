@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Smart Room Automation</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+      }
+      .card {
+        border: 1px solid #ccc;
+        padding: 20px;
+        width: 300px;
+        margin-bottom: 20px;
+      }
+      button {
+        padding: 10px 15px;
+        margin-right: 10px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Smart Room Automation Dashboard</h1>
+
+    <div class="card">
+      <h3>Live Sensor Data</h3>
+
+      <p>
+        <strong>Motion:</strong>
+        {{ 'Detected' if data.motion else 'No Motion' }}
+      </p>
+
+      <p>
+        <strong>Light Level:</strong>
+        {{ data.light if data.light else 'Unknown' }}
+      </p>
+
+      <p>
+        <strong>Temperature:</strong>
+        {{ data.temperature if data.temperature else 'N/A' }} °C
+      </p>
+
+      <p>
+        <strong>Humidity:</strong>
+        {{ data.humidity if data.humidity else 'N/A' }} %
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Manual Control</h3>
+
+      <form method="post" action="/on">
+        <button type="submit">Turn Light ON</button>
+      </form>
+
+      <form method="post" action="/off">
+        <button type="submit">Turn Light OFF</button>
+      </form>
+    </div>
+  </body>
+</html>
