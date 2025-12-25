@@ -50,6 +50,7 @@
     <div class="card">
       <h3>Manual Control</h3>
 
+      {% if current_user.role == "admin" %}
       <form method="post" action="/on">
         <button type="submit">Turn Light ON</button>
       </form>
@@ -57,6 +58,9 @@
       <form method="post" action="/off">
         <button type="submit">Turn Light OFF</button>
       </form>
+      {% else %}
+      <p>You do not have permission to control the lights.</p>
+      {% endif %}
     </div>
   </body>
 </html>

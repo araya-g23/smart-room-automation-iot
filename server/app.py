@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask, render_template, redirect, request, url_for
+from flask import Flask, render_template, redirect, request, url_for, abort
 from flask_login import (
     LoginManager,
     login_user,
@@ -12,6 +12,8 @@ from models import db, User
 from pubnub.pnconfiguration import PNConfiguration
 from pubnub.pubnub import PubNub
 from pubnub.callbacks import SubscribeCallback
+from functools import wraps
+
 
 # Load environment variables
 load_dotenv()
@@ -65,13 +67,27 @@ def dashboard():
     return render_template("dashboard.html", data=latest_data)
 
 
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or current_user.role != "admin":
+            abort(403)
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
 @app.route("/on", methods=["POST"])
+@login_required
+@admin_required
 def light_on():
     pubnub.publish().channel("home-automation-control").message("TURN_LIGHT_ON").sync()
     return redirect("/")
 
 
 @app.route("/off", methods=["POST"])
+@login_required
+@admin_required
 def light_off():
     pubnub.publish().channel("home-automation-control").message("TURN_LIGHT_OFF").sync()
     return redirect("/")
