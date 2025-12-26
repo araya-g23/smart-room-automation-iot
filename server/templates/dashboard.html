@@ -23,9 +23,13 @@
   <body>
     <h1>Smart Room Automation Dashboard</h1>
 
+    <p>Logged in as {{ current_user.email }}</p>
+
+    <form action="{{ url_for('logout') }}" method="get" style="float: right">
+      <button type="submit">Logout</button>
+    </form>
     <div class="card">
       <h3>Live Sensor Data</h3>
-
       <p>
         <strong>Motion:</strong>
         {{ 'Detected' if data.motion else 'No Motion' }}

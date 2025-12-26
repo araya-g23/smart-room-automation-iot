@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask, render_template, redirect, request, url_for, abort
+from flask import Flask, render_template, redirect, request, url_for, abort, jsonify
 from flask_login import (
     LoginManager,
     login_user,
@@ -13,6 +13,7 @@ from pubnub.pnconfiguration import PNConfiguration
 from pubnub.pubnub import PubNub
 from pubnub.callbacks import SubscribeCallback
 from functools import wraps
+from pubnub_access import generate_user_token
 
 
 # Load environment variables
@@ -81,6 +82,9 @@ def admin_required(f):
 @login_required
 @admin_required
 def light_on():
+    if current_user.role != "admin":
+        return "Forbidden", 403
+
     pubnub.publish().channel("home-automation-control").message("TURN_LIGHT_ON").sync()
     return redirect("/")
 
@@ -89,6 +93,8 @@ def light_on():
 @login_required
 @admin_required
 def light_off():
+    if current_user.role != "admin":
+        return "Forbidden", 403
     pubnub.publish().channel("home-automation-control").message("TURN_LIGHT_OFF").sync()
     return redirect("/")
 
@@ -140,6 +146,18 @@ def register():
         return redirect(url_for("login"))
 
     return render_template("register.html")
+
+
+@app.route("/admin/grant/<int:user_id>")
+@login_required
+def grant_pubnub_access(user_id):
+    if current_user.role != "admin":
+        return "Forbidden", 403
+
+    user = User.query.get_or_404(user_id)
+    token = generate_user_token(is_admin=(user.role == "admin"))
+
+    return jsonify({"user": user.email, "pubnub_token": token})
 
 
 @app.route("/logout")
