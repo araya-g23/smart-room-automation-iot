@@ -188,6 +188,12 @@ def get_pubnub_for_current_user():
     return client
 
 
+@app.route("/settings")
+@login_required
+def settings():
+    return render_template("settings.html")
+
+
 @app.route("/logout")
 @login_required
 def logout():

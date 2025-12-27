@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}Smart Room{% endblock %}</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+  </head>
+  <body>
+    <div class="eg_appLayout">
+      <!-- Sidebar -->
+      <aside class="eg_sidebar" id="eg_sidebar">
+        <div class="eg_sidebarHeader">
+          <h2>Smart Room</h2>
+        </div>
+
+        <nav class="eg_sidebarNav">
+          <a href="{{ url_for('dashboard') }}" class="eg_navItem">Dashboard</a>
+          <a href="{{ url_for('settings') }}" class="eg_navItem">Settings</a>
+
+          {% if current_user.is_authenticated and current_user.role == "admin"
+          %}
+          <div class="eg_divider"></div>
+
+          <a href="#" class="eg_navItem"> Users </a>
+
+          <a href="#" class="eg_navItem"> Subscriptions </a>
+          {% endif %}
+
+          <div class="eg_divider"></div>
+
+          <a href="{{ url_for('logout') }}" class="eg_navItem eg_logout">
+            Logout
+          </a>
+        </nav>
+      </aside>
+
+      <!-- MOBILE OVERLAY -->
+      <div
+        class="eg_sidebarOverlay"
+        id="eg_sidebarOverlay"
+        onclick="eg_toggleSidebar()"
+      ></div>
+
+      <div class="eg_mainArea">
+        <header class="eg_topbar">
+          <button class="eg_menuBtn" onclick="eg_toggleSidebar()">☰</button>
+
+          {% if current_user.is_authenticated %}
+          <div class="eg_userInfo">{{ current_user.email }}</div>
+          {% endif %}
+        </header>
+
+        <main class="eg_content">{% block content %}{% endblock %}</main>
+      </div>
+    </div>
+
+    <script>
+      function eg_toggleSidebar() {
+        document
+          .getElementById("eg_sidebar")
+          .classList.toggle("eg_sidebarOpen");
+
+        document
+          .getElementById("eg_sidebarOverlay")
+          .classList.toggle("eg_overlayOpen");
+      }
+    </script>
+  </body>
+</html>
