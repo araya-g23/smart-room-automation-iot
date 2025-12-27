@@ -1,6 +1,15 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask, render_template, redirect, request, url_for, abort
+from flask import (
+    Flask,
+    render_template,
+    redirect,
+    request,
+    url_for,
+    abort,
+    jsonify,
+    session,
+)
 from flask_login import (
     LoginManager,
     login_user,
@@ -13,6 +22,7 @@ from pubnub.pnconfiguration import PNConfiguration
 from pubnub.pubnub import PubNub
 from pubnub.callbacks import SubscribeCallback
 from functools import wraps
+from pubnub_access import generate_user_token
 
 
 # Load environment variables
@@ -81,7 +91,11 @@ def admin_required(f):
 @login_required
 @admin_required
 def light_on():
-    pubnub.publish().channel("home-automation-control").message("TURN_LIGHT_ON").sync()
+    if current_user.role != "admin":
+        return "Forbidden", 403
+
+    client = get_pubnub_for_current_user()
+    client.publish().channel("home-automation-control").message("TURN_LIGHT_ON").sync()
     return redirect("/")
 
 
@@ -89,7 +103,10 @@ def light_on():
 @login_required
 @admin_required
 def light_off():
-    pubnub.publish().channel("home-automation-control").message("TURN_LIGHT_OFF").sync()
+    if current_user.role != "admin":
+        return "Forbidden", 403
+    client = get_pubnub_for_current_user()
+    client.publish().channel("home-automation-control").message("TURN_LIGHT_OFF").sync()
     return redirect("/")
 
 
@@ -113,6 +130,8 @@ def login():
 
         if user and user.check_password(password):
             login_user(user)
+            token = generate_user_token(user.id, user.role)
+            session["pubnub_token"] = token
             return redirect(url_for("dashboard"))
 
         return "Invalid login", 401
@@ -140,6 +159,33 @@ def register():
         return redirect(url_for("login"))
 
     return render_template("register.html")
+
+
+@app.route("/admin/grant/<int:user_id>")
+@login_required
+def grant_pubnub_access(user_id):
+    if current_user.role != "admin":
+        return "Forbidden", 403
+
+    user = User.query.get_or_404(user_id)
+    token = generate_user_token(is_admin=(user.role == "admin"))
+
+    return jsonify({"user": user.email, "pubnub_token": token})
+
+
+def get_pubnub_for_current_user():
+    token = session.get("pubnub_token")
+    if not token:
+        abort(403)
+
+    pnconfig = PNConfiguration()
+    pnconfig.publish_key = PUBLISH_KEY
+    pnconfig.subscribe_key = SUBSCRIBE_KEY
+    pnconfig.uuid = str(current_user.id)
+
+    client = PubNub(pnconfig)
+    client.set_token(token)
+    return client
 
 
 @app.route("/logout")
