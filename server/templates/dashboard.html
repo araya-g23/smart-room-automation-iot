@@ -1,70 +1,33 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Smart Room Automation</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 40px;
-      }
-      .card {
-        border: 1px solid #ccc;
-        padding: 20px;
-        width: 300px;
-        margin-bottom: 20px;
-      }
-      button {
-        padding: 10px 15px;
-        margin-right: 10px;
-        cursor: pointer;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Smart Room Automation Dashboard</h1>
+{% extends "base.html" %} {% block title %}Dashboard{% endblock %} {% block
+content %}
 
-    <p>Logged in as {{ current_user.email }}</p>
+<h2>Smart Room Automation Dashboard</h2>
+<p>Logged in as {{ current_user.email }}</p>
 
-    <form action="{{ url_for('logout') }}" method="get" style="float: right">
-      <button type="submit">Logout</button>
+<div class="eg_card">
+  <h3>Live Sensor Data</h3>
+
+  <p>
+    <strong>Motion:</strong> {{ data.motion if data.motion is not none else "No
+    Motion" }}
+  </p>
+  <p><strong>Light Level:</strong> {{ data.light or "Unknown" }}</p>
+  <p><strong>Temperature:</strong> {{ data.temperature or "N/A" }} °C</p>
+  <p><strong>Humidity:</strong> {{ data.humidity or "N/A" }} %</p>
+</div>
+
+{% if current_user.role == "admin" %}
+<div class="eg_card">
+  <h3>Manual Control</h3>
+
+  <div class="eg_btnGroup">
+    <form method="POST" action="/on">
+      <button type="submit" class="eg_btn eg_btnOn">Turn Light ON</button>
     </form>
-    <div class="card">
-      <h3>Live Sensor Data</h3>
-      <p>
-        <strong>Motion:</strong>
-        {{ 'Detected' if data.motion else 'No Motion' }}
-      </p>
 
-      <p>
-        <strong>Light Level:</strong>
-        {{ data.light if data.light else 'Unknown' }}
-      </p>
-
-      <p>
-        <strong>Temperature:</strong>
-        {{ data.temperature if data.temperature else 'N/A' }} °C
-      </p>
-
-      <p>
-        <strong>Humidity:</strong>
-        {{ data.humidity if data.humidity else 'N/A' }} %
-      </p>
-    </div>
-
-    <div class="card">
-      <h3>Manual Control</h3>
-
-      {% if current_user.role == "admin" %}
-      <form method="post" action="/on">
-        <button type="submit">Turn Light ON</button>
-      </form>
-
-      <form method="post" action="/off">
-        <button type="submit">Turn Light OFF</button>
-      </form>
-      {% else %}
-      <p>You do not have permission to control the lights.</p>
-      {% endif %}
-    </div>
-  </body>
-</html>
+    <form method="POST" action="/off">
+      <button type="submit" class="eg_btn eg_btnOff">Turn Light OFF</button>
+    </form>
+  </div>
+</div>
+{% endif %} {% endblock %}

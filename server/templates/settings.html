@@ -1,0 +1,11 @@
+{% extends "base.html" %} {% block title %}Settings{% endblock %} {% block
+content %}
+<h2>Settings</h2>
+
+<p>Update your account details here.</p>
+
+<div class="eg_card">
+  <p><strong>Email:</strong> {{ current_user.email }}</p>
+  <p><strong>Role:</strong> {{ current_user.role }}</p>
+</div>
+{% endblock %}
