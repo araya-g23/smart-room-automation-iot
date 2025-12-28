@@ -52,3 +52,22 @@ def generate_pi_token():
     )
 
     return envelope.result.token
+
+
+def generate_server_token():
+    pubnub = get_pubnub_admin()
+
+    envelope = (
+        pubnub.grant_token()
+        .authorized_uuid("home-automation-server")
+        .ttl(1440)
+        .channels(
+            [
+                Channel.id("home-automation-sensor-data").read(),
+                Channel.id("home-automation-control").write(),
+            ]
+        )
+        .sync()
+    )
+
+    return envelope.result.token

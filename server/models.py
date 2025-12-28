@@ -18,3 +18,25 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+
+class AuditLog(db.Model):
+    __tablename__ = "audit_logs"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=True)
+    action = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(50))
+    ip_address = db.Column(db.String(45))
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+
+class SensorLog(db.Model):
+    __tablename__ = "sensor_logs"
+
+    id = db.Column(db.Integer, primary_key=True)
+    motion = db.Column(db.Boolean, nullable=True)
+    light = db.Column(db.String(50), nullable=True)
+    temperature = db.Column(db.Float, nullable=True)
+    humidity = db.Column(db.Float, nullable=True)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())

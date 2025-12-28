@@ -23,6 +23,8 @@ from pubnub.pubnub import PubNub
 from pubnub.callbacks import SubscribeCallback
 from functools import wraps
 from pubnub_access import generate_user_token
+from models import SensorLog
+from utils.audit import log_action
 
 
 # Load environment variables
@@ -59,12 +61,26 @@ pnconfig.uuid = "home-automation-server"
 
 pubnub = PubNub(pnconfig)
 
+pubnub.set_token(os.getenv("PUBNUB_SERVER_TOKEN"))
+
 
 class SensorDataListener(SubscribeCallback):
     def message(self, pubnub, message):
+        print("Received sensor data:", message.message)
         global latest_data
+
         if message.channel == "home-automation-sensor-data":
             latest_data = message.message
+
+            with app.app_context():
+                log = SensorLog(
+                    motion=message.message.get("motion"),
+                    light=message.message.get("light"),
+                    temperature=message.message.get("temperature"),
+                    humidity=message.message.get("humidity"),
+                )
+                db.session.add(log)
+                db.session.commit()
 
 
 # start PubNub listener
@@ -96,6 +112,8 @@ def light_on():
 
     client = get_pubnub_for_current_user()
     client.publish().channel("home-automation-control").message("TURN_LIGHT_ON").sync()
+
+    log_action("Light turned ON")
     return redirect("/")
 
 
@@ -107,6 +125,8 @@ def light_off():
         return "Forbidden", 403
     client = get_pubnub_for_current_user()
     client.publish().channel("home-automation-control").message("TURN_LIGHT_OFF").sync()
+
+    log_action("Light turned OFF")
     return redirect("/")
 
 
@@ -132,6 +152,7 @@ def login():
             login_user(user)
             token = generate_user_token(user.id, user.role)
             session["pubnub_token"] = token
+            log_action("User logged in")
             return redirect(url_for("dashboard"))
 
         return "Invalid login", 401
@@ -197,6 +218,7 @@ def settings():
 @app.route("/logout")
 @login_required
 def logout():
+    log_action("User logged out")
     logout_user()
     return redirect(url_for("login"))
 
