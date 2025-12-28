@@ -11,6 +11,7 @@ load_dotenv()
 
 PUBLISH_KEY = os.getenv("PUBNUB_PUBLISH_KEY")
 SUBSCRIBE_KEY = os.getenv("PUBNUB_SUBSCRIBE_KEY")
+PI_TOKEN = os.getenv("PUBNUB_PI_TOKEN")
 
 if not PUBLISH_KEY or not SUBSCRIBE_KEY:
     raise ValueError("PubNub keys are not set in environment variables.")
@@ -18,7 +19,8 @@ if not PUBLISH_KEY or not SUBSCRIBE_KEY:
 pnconfig = PNConfiguration()
 pnconfig.publish_key = PUBLISH_KEY
 pnconfig.subscribe_key = SUBSCRIBE_KEY
-pnconfig.uuid = "home-automation-system"
+pnconfig.uuid = "raspberry-pi-01"
+pnconfig.auth_key = PI_TOKEN
 
 pubnub = PubNub(pnconfig)
 
