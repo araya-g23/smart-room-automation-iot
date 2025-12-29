@@ -28,6 +28,12 @@
           <div class="eg_divider"></div>
 
           <a href="#" class="eg_navItem"> Users </a>
+          <a href="{{ url_for('admin_audit_logs') }}" class="eg_navItem">
+            Audit Logs
+          </a>
+          <a href="{{ url_for('admin_sensor_logs') }}" class="eg_navItem">
+            Sensor Logs
+          </a>
 
           <a href="#" class="eg_navItem"> Subscriptions </a>
           {% endif %}

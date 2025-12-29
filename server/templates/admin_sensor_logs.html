@@ -1,0 +1,52 @@
+{% extends "base.html" %} {% block title %}Sensor Logs{% endblock %} {% block
+content %}
+<h1>Sensor Logs</h1>
+
+<a href="{{ url_for('export_sensor_logs_csv') }}" class="eg_btn eg_btnPrimary">
+  Export CSV
+</a>
+
+<table class="eg_table">
+  <thead>
+    <tr>
+      <th>Time</th>
+      <th>Motion</th>
+      <th>Light</th>
+      <th>Temperature (°C)</th>
+      <th>Humidity (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for log in logs %}
+    <tr>
+      <td>{{ log.created_at }}</td>
+      <td>{{ "Yes" if log.motion else "No" }}</td>
+      <td>{{ log.light }}</td>
+      <td>{{ log.temperature }}</td>
+      <td>{{ log.humidity }}</td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="5">No sensor data available.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="eg_pagination">
+  {% if pagination.has_prev %}
+  <a href="{{ url_for('admin_sensor_logs', page=pagination.prev_num) }}">
+    ← Previous
+  </a>
+  {% endif %}
+
+  <span> Page {{ pagination.page }} of {{ pagination.pages }} </span>
+
+  {% if pagination.has_next %}
+  <a href="{{ url_for('admin_sensor_logs', page=pagination.next_num) }}">
+    Next →
+  </a>
+  {% endif %}
+</div>
+
+{% endblock %}
