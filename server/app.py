@@ -9,6 +9,7 @@ from flask import (
     abort,
     jsonify,
     session,
+    Response,
 )
 from flask_login import (
     LoginManager,
@@ -25,6 +26,9 @@ from functools import wraps
 from pubnub_access import generate_user_token
 from models import SensorLog
 from utils.audit import log_action
+from models import AuditLog
+import csv
+from io import StringIO
 
 
 # Load environment variables
@@ -213,6 +217,75 @@ def get_pubnub_for_current_user():
 @login_required
 def settings():
     return render_template("settings.html")
+
+
+@app.route("/admin/audit-logs")
+@login_required
+def admin_audit_logs():
+    if current_user.role != "admin":
+        abort(403)
+
+    logs = AuditLog.query.order_by(AuditLog.created_at.desc()).limit(50).all()
+
+    return render_template("admin_audit_logs.html", logs=logs)
+
+
+@app.route("/admin/sensor-logs")
+@login_required
+@admin_required
+def admin_sensor_logs():
+    page = request.args.get("page", 1, type=int)
+    per_page = 20
+
+    pagination = SensorLog.query.order_by(SensorLog.created_at.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+
+    return render_template(
+        "admin_sensor_logs.html",
+        logs=pagination.items,
+        pagination=pagination,
+    )
+
+
+@app.route("/admin/sensor-logs/export")
+@login_required
+@admin_required
+def export_sensor_logs_csv():
+    logs = SensorLog.query.order_by(SensorLog.created_at.desc()).all()
+
+    si = StringIO()
+    writer = csv.writer(si)
+
+    writer.writerow(
+        [
+            "Time",
+            "Motion",
+            "Light",
+            "Temperature",
+            "Humidity",
+        ]
+    )
+
+    for log in logs:
+        writer.writerow(
+            [
+                log.created_at,
+                log.motion,
+                log.light,
+                log.temperature,
+                log.humidity,
+            ]
+        )
+
+    output = si.getvalue()
+    si.close()
+
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=sensor_logs.csv"},
+    )
 
 
 @app.route("/logout")
