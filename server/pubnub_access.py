@@ -16,12 +16,12 @@ def get_pubnub_admin():
     return PubNub(pnconfig)
 
 
-def generate_user_token(user_id, role="user"):
+def generate_user_token(user_id, role, is_subscribed):
     pubnub = get_pubnub_admin()
 
     channels = [Channel.id("home-automation-sensor-data").read()]
 
-    if role == "admin":
+    if role == "admin" or is_subscribed:
         channels.append(Channel.id("home-automation-control").read().write())
 
     envelope = (

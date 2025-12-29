@@ -27,13 +27,16 @@
           %}
           <div class="eg_divider"></div>
 
-          <a href="#" class="eg_navItem"> Users </a>
           <a href="{{ url_for('admin_audit_logs') }}" class="eg_navItem">
             Audit Logs
           </a>
           <a href="{{ url_for('admin_sensor_logs') }}" class="eg_navItem">
             Sensor Logs
           </a>
+
+          {% if current_user.role == "admin" %}
+          <a href="{{ url_for('admin_users') }}" class="eg_navItem">Users</a>
+          {% endif %}
 
           <a href="#" class="eg_navItem"> Subscriptions </a>
           {% endif %}

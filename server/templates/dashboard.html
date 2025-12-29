@@ -16,7 +16,7 @@ content %}
   <p><strong>Humidity:</strong> {{ data.humidity or "N/A" }} %</p>
 </div>
 
-{% if current_user.role == "admin" %}
+{% if current_user.role == "admin" or current_user.is_subscribed %}
 <div class="eg_card">
   <h3>Manual Control</h3>
 
@@ -28,6 +28,8 @@ content %}
     <form method="POST" action="/off">
       <button type="submit" class="eg_btn eg_btnOff">Turn Light OFF</button>
     </form>
+    {% else %}
+    <p class="eg_notice">Subscribe to enable device control</p>
   </div>
 </div>
 {% endif %} {% endblock %}
