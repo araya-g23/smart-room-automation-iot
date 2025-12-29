@@ -107,12 +107,28 @@ def admin_required(f):
     return decorated_function
 
 
+def control_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            abort(403)
+
+        if current_user.role == "admin":
+            return f(*args, **kwargs)
+
+        # Check subscription status
+        if getattr(current_user, "is_subscribed", False):
+            return f(*args, **kwargs)
+
+        abort(403)
+
+    return decorated_function
+
+
 @app.route("/on", methods=["POST"])
 @login_required
-@admin_required
+@control_required
 def light_on():
-    if current_user.role != "admin":
-        return "Forbidden", 403
 
     client = get_pubnub_for_current_user()
     client.publish().channel("home-automation-control").message("TURN_LIGHT_ON").sync()
@@ -123,10 +139,8 @@ def light_on():
 
 @app.route("/off", methods=["POST"])
 @login_required
-@admin_required
+@control_required
 def light_off():
-    if current_user.role != "admin":
-        return "Forbidden", 403
     client = get_pubnub_for_current_user()
     client.publish().channel("home-automation-control").message("TURN_LIGHT_OFF").sync()
 
@@ -154,7 +168,7 @@ def login():
 
         if user and user.check_password(password):
             login_user(user)
-            token = generate_user_token(user.id, user.role)
+            token = generate_user_token(user.id, user.role, user.is_subscribed)
             session["pubnub_token"] = token
             log_action("User logged in")
             return redirect(url_for("dashboard"))
@@ -286,6 +300,33 @@ def export_sensor_logs_csv():
         mimetype="text/csv",
         headers={"Content-Disposition": "attachment; filename=sensor_logs.csv"},
     )
+
+
+@app.route("/admin/subscription/toggle/<int:user_id>", methods=["POST"])
+@login_required
+@admin_required
+def toggle_user_subscription(user_id):
+    user = User.query.get_or_404(user_id)
+
+    if user.role == "admin":
+        abort(400)
+
+    user.is_subscribed = not user.is_subscribed
+    db.session.commit()
+
+    log_action(
+        f"Subscription {'enabled' if user.is_subscribed else 'disabled'} for {user.email}"
+    )
+
+    return redirect(url_for("admin_users"))
+
+
+@app.route("/admin/users")
+@login_required
+@admin_required
+def admin_users():
+    users = User.query.all()
+    return render_template("admin_users.html", users=users)
 
 
 @app.route("/logout")

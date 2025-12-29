@@ -1,0 +1,39 @@
+{% extends "base.html" %} {% block title %}User Management{% endblock %} {%
+block content %}
+<h2>User Management</h2>
+
+<table class="eg_table">
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Subscribed</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+    <tr>
+      <td>{{ user.email }}</td>
+      <td>{{ user.role }}</td>
+      <td>
+        {% if user.is_subscribed or user.role == "admin" %} ✅ Active {% else %}
+        ❌ Inactive {% endif %}
+      </td>
+      <td>
+        {% if user.role != "admin" %}
+        <form
+          method="POST"
+          action="{{ url_for('toggle_user_subscription', user_id=user.id) }}"
+        >
+          <button class="eg_btn">
+            {% if user.is_subscribed %} Disable {% else %} Enable {% endif %}
+          </button>
+        </form>
+        {% else %} — {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
