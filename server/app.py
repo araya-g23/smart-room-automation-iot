@@ -224,6 +224,11 @@ def get_pubnub_for_current_user():
 
     client = PubNub(pnconfig)
     client.set_token(token)
+
+    try:
+        client.publish().channel("home-automation-control").message("ping").sync()
+    except Exception:
+        abort(403, description="Subscription expired. Please contact admin.")
     return client
 
 
