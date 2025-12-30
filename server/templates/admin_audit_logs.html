@@ -1,26 +1,99 @@
 {% extends "base.html" %} {% block title %}Audit Logs{% endblock %} {% block
 content %}
-<h2>Audit Logs</h2>
 
-<table border="1" cellpadding="8">
-  <tr>
-    <th>ID</th>
-    <th>User ID</th>
-    <th>Role</th>
-    <th>Action</th>
-    <th>IP Address</th>
-    <th>Timestamp</th>
-  </tr>
+<div class="eg_pageHeader">
+  <div>
+    <h2 class="eg_pageTitle">Audit Logs</h2>
+    <p class="eg_pageSub">System activity and security-related events.</p>
+  </div>
+  <a href="{{ url_for('export_audit_logs_csv') }}" class="eg_btn eg_btnPrimary">
+    ⬇ Export CSV
+  </a>
+</div>
+<form method="GET" class="eg_filterBar">
+  <select name="role" class="eg_filterSelect">
+    <option value="">All roles</option>
+    <option value="admin" {% if role == "admin" %}selected{% endif %}>Admin</option>
+    <option value="user" {% if role == "user" %}selected{% endif %}>User</option>
+  </select>
 
-  {% for log in logs %}
-  <tr>
-    <td>{{ log.id }}</td>
-    <td>{{ log.user_id }}</td>
-    <td>{{ log.role }}</td>
-    <td>{{ log.action }}</td>
-    <td>{{ log.ip_address }}</td>
-    <td>{{ log.created_at }}</td>
-  </tr>
-  {% endfor %}
-</table>
+  <input
+    type="text"
+    name="action"
+    placeholder="Search action..."
+    value="{{ action }}"
+    class="eg_filterInput"
+  />
+
+  <button type="submit" class="eg_btn eg_btnPrimary">
+    Filter
+  </button>
+
+  <a href="{{ url_for('admin_audit_logs') }}" class="eg_btn eg_btnPrimary">
+    Reset
+  </a>
+</form>
+
+
+<div class="eg_card eg_tableCard">
+  <table class="eg_table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>User</th>
+        <th>Role</th>
+        <th>Action</th>
+        <th>IP</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for log in logs %}
+      <tr>
+        <td>{{ log.id }}</td>
+        <td>{{ log.user_id or "—" }}</td>
+        <td>{{ log.role or "—" }}</td>
+        <td class="eg_logAction">
+          {% if "logged in" in log.action %}
+            🔑 {{ log.action }}
+          {% elif "logged out" in log.action %}
+            🚪 {{ log.action }}
+          {% elif "Light turned ON" in log.action %}
+            💡 {{ log.action }}
+          {% elif "Light turned OFF" in log.action %}
+            🌙 {{ log.action }}
+          {% elif "Subscription enabled" in log.action %}
+            ✅ {{ log.action }}
+          {% elif "Subscription disabled" in log.action %}
+            ❌ {{ log.action }}
+          {% else %}
+            ℹ️ {{ log.action }}
+          {% endif %}
+        </td>
+        <td>{{ log.ip_address }}</td>
+        <td>{{ log.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+  <div class="eg_pagination">
+  {% if pagination.has_prev %}
+    <a href="{{ url_for('admin_audit_logs', page=pagination.prev_num, role=role, action=action) }}">
+      ← Previous
+    </a>
+  {% endif %}
+
+  <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+
+  {% if pagination.has_next %}
+    <a href="{{ url_for('admin_audit_logs', page=pagination.next_num, role=role, action=action) }}">
+      Next →
+    </a>
+  {% endif %}
+</div>
+
+</div>
+
 {% endblock %}

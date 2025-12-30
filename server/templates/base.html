@@ -16,8 +16,14 @@
       <!-- Sidebar -->
       <aside class="eg_sidebar" id="eg_sidebar">
         <div class="eg_sidebarHeader">
-          <h2>Smart Room</h2>
+          <img
+            src="{{ url_for('static', filename='images/logo.png') }}"
+            alt="Smart Room Logo"
+            class="eg_logoImage"
+          />
         </div>
+
+        <div class="eg_sidebarHeaderDivider"></div>
 
         <nav class="eg_sidebarNav">
           <a href="{{ url_for('dashboard') }}" class="eg_navItem">Dashboard</a>
@@ -58,10 +64,15 @@
 
       <div class="eg_mainArea">
         <header class="eg_topbar">
-          <button class="eg_menuBtn" onclick="eg_toggleSidebar()">☰</button>
+          <div class="eg_topbarLeft">
+            <button class="eg_menuBtn" onclick="eg_toggleSidebar()">☰</button>
+            <!-- <span class="eg_topbarBrand">Smart Room</span> -->
+          </div>
 
           {% if current_user.is_authenticated %}
-          <div class="eg_userInfo">{{ current_user.email }}</div>
+          <div class="eg_topbarRight">
+            <span class="eg_userEmail">{{ current_user.email }}</span>
+          </div>
           {% endif %}
         </header>
 

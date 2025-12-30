@@ -1,35 +1,148 @@
 {% extends "base.html" %} {% block title %}Dashboard{% endblock %} {% block
 content %}
+<div class="eg_pageHeader">
+  <div>
+    <h2 class="eg_pageTitle">Smart Room Automation</h2>
+    <p class="eg_pageSub">Live overview of your room sensors and controls.</p>
+  </div>
 
-<h2>Smart Room Automation Dashboard</h2>
-<p>Logged in as {{ current_user.email }}</p>
+  <div class="eg_statusPills">
+    {% if data.timestamp %} {% set age = server_time - data.timestamp %}
+    <span
+      class="eg_pill {% if age < 90 %}eg_pillOk{% else %}eg_pillWarn{% endif %}"
+    >
+      {% if age < 90 %} ● Live {% else %} ● No recent data {% endif %}
+    </span>
+    {% else %}
+    <span class="eg_pill eg_pillWarn">● No data</span>
+    {% endif %}
 
-<div class="eg_card">
-  <h3>Live Sensor Data</h3>
+    <span class="eg_pill">
+      Role: <strong>{{ current_user.role }}</strong>
+    </span>
 
-  <p>
-    <strong>Motion:</strong> {{ data.motion if data.motion is not none else "No
-    Motion" }}
-  </p>
-  <p><strong>Light Level:</strong> {{ data.light or "Unknown" }}</p>
-  <p><strong>Temperature:</strong> {{ data.temperature or "N/A" }} °C</p>
-  <p><strong>Humidity:</strong> {{ data.humidity or "N/A" }} %</p>
+    {% if current_user.role == "admin" %}
+    <span class="eg_pill eg_pillOk">Admin</span>
+    {% else %} {% if current_user.is_subscribed %}
+    <span class="eg_pill eg_pillOk">Subscription: Active</span>
+    {% else %}
+    <span class="eg_pill eg_pillWarn">Subscription: Inactive</span>
+    {% endif %} {% endif %}
+  </div>
 </div>
 
-{% if current_user.role == "admin" or current_user.is_subscribed %}
-<div class="eg_card">
-  <h3>Manual Control</h3>
+<div class="eg_statsGrid">
+  <div class="eg_statCard">
+    <div class="eg_statTop">
+      <span class="eg_statLabel">Motion</span>
+      {% if data.motion %}
+      <span class="eg_badge eg_badgeOk">Detected</span>
+      {% else %}
+      <span class="eg_badge eg_badgeNeutral">None</span>
+      {% endif %}
+    </div>
+    <div class="eg_statValue">{{ "Yes" if data.motion else "No" }}</div>
+    <div class="eg_statHint">PIR sensor status</div>
+  </div>
 
-  <div class="eg_btnGroup">
+  <div class="eg_statCard">
+    <div class="eg_statTop">
+      <span class="eg_statLabel">Light Level</span>
+      {% if data.light == "bright" %}
+      <span class="eg_badge eg_badgeOk">Bright</span>
+      {% else %}
+      <span class="eg_badge eg_badgeNeutral">Dark</span>
+      {% endif %}
+    </div>
+    <div class="eg_statValue">{{ data.light or "Unknown" }}</div>
+    <div class="eg_statHint">LDR reading</div>
+  </div>
+
+  <div class="eg_statCard">
+    <div class="eg_statTop">
+      <span class="eg_statLabel">Temperature</span>
+      <span class="eg_badge eg_badgeNeutral">°C</span>
+    </div>
+    <div class="eg_statValue">
+      {{ data.temperature if data.temperature is not none else "—" }}
+    </div>
+    <div class="eg_statHint">DHT sensor</div>
+  </div>
+
+  <div class="eg_statCard">
+    <div class="eg_statTop">
+      <span class="eg_statLabel">Humidity</span>
+      <span class="eg_badge eg_badgeNeutral">%</span>
+    </div>
+    <div class="eg_statValue">
+      {{ data.humidity if data.humidity is not none else "—" }}
+    </div>
+    <div class="eg_statHint">DHT sensor</div>
+  </div>
+</div>
+
+{% if data.timestamp %}
+<p class="eg_statHint">
+  Last updated {{ (server_time - data.timestamp) | int }} seconds ago
+</p>
+{% else %}
+<p class="eg_statHint">No sensor data received yet</p>
+{% endif %} {% if current_user.role == "admin" or current_user.is_subscribed %}
+<div class="eg_card eg_controlCard">
+  <h3 class="eg_cardTitle">Manual Control</h3>
+  <p class="eg_cardSub">Send a command to the Raspberry Pi in real time.</p>
+
+  <div class="eg_controlGrid">
     <form method="POST" action="/on">
-      <button type="submit" class="eg_btn eg_btnOn">Turn Light ON</button>
+      <button
+        type="submit"
+        class="eg_btn eg_btnOn eg_btnLarge"
+        {%
+        if
+        current_user.role
+        !="admin"
+        and
+        not
+        current_user.is_subscribed
+        %}disabled{%
+        endif
+        %}
+      >
+        💡 Turn Light ON
+      </button>
     </form>
 
     <form method="POST" action="/off">
-      <button type="submit" class="eg_btn eg_btnOff">Turn Light OFF</button>
+      <button
+        type="submit"
+        class="eg_btn eg_btnOff eg_btnLarge"
+        {%
+        if
+        current_user.role
+        !="admin"
+        and
+        not
+        current_user.is_subscribed
+        %}disabled{%
+        endif
+        %}
+      >
+        🌙 Turn Light OFF
+      </button>
     </form>
-    {% else %}
-    <p class="eg_notice">Subscribe to enable device control</p>
+  </div>
+
+  {% if current_user.role == "admin" %}
+  <p class="eg_controlHint">Admin override enabled</p>
+  {% endif %}
+</div>
+{% else %}
+<div class="eg_card eg_controlCard">
+  <h3 class="eg_cardTitle">Manual Control</h3>
+  <p class="eg_cardSub">Manual control is disabled.</p>
+
+  <div class="eg_controlLocked">
+    🔒 Subscription required to control devices.
   </div>
 </div>
 {% endif %} {% endblock %}

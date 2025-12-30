@@ -29,6 +29,7 @@ from utils.audit import log_action
 from models import AuditLog
 import csv
 from io import StringIO
+import time
 
 
 # Load environment variables
@@ -75,6 +76,7 @@ class SensorDataListener(SubscribeCallback):
 
         if message.channel == "home-automation-sensor-data":
             latest_data = message.message
+            latest_data["timestamp"] = time.time()
 
             with app.app_context():
                 log = SensorLog(
@@ -94,7 +96,7 @@ pubnub.subscribe().channels("home-automation-sensor-data").execute()
 
 @app.route("/")
 def dashboard():
-    return render_template("dashboard.html", data=latest_data)
+    return render_template("dashboard.html", data=latest_data, server_time=time.time())
 
 
 def admin_required(f):
@@ -240,13 +242,33 @@ def settings():
 
 @app.route("/admin/audit-logs")
 @login_required
+@admin_required
 def admin_audit_logs():
-    if current_user.role != "admin":
-        abort(403)
+    page = request.args.get("page", 1, type=int)
+    role = request.args.get("role", "")
+    action = request.args.get("action", "")
 
-    logs = AuditLog.query.order_by(AuditLog.created_at.desc()).limit(50).all()
+    query = AuditLog.query
 
-    return render_template("admin_audit_logs.html", logs=logs)
+    if role:
+        query = query.filter(AuditLog.role == role)
+
+    if action:
+        query = query.filter(AuditLog.action.ilike(f"%{action}%"))
+
+    pagination = query.order_by(AuditLog.created_at.desc()).paginate(
+        page=page,
+        per_page=15,
+        error_out=False,
+    )
+
+    return render_template(
+        "admin_audit_logs.html",
+        logs=pagination.items,
+        pagination=pagination,
+        role=role,
+        action=action,
+    )
 
 
 @app.route("/admin/sensor-logs")
@@ -304,6 +326,49 @@ def export_sensor_logs_csv():
         output,
         mimetype="text/csv",
         headers={"Content-Disposition": "attachment; filename=sensor_logs.csv"},
+    )
+
+
+@app.route("/admin/audit-logs/export")
+@login_required
+@admin_required
+def export_audit_logs_csv():
+    logs = AuditLog.query.order_by(AuditLog.created_at.desc()).all()
+
+    si = StringIO()
+    writer = csv.writer(si)
+
+    # CSV header
+    writer.writerow(
+        [
+            "ID",
+            "User ID",
+            "Role",
+            "Action",
+            "IP Address",
+            "Timestamp",
+        ]
+    )
+
+    for log in logs:
+        writer.writerow(
+            [
+                log.id,
+                log.user_id,
+                log.role,
+                log.action,
+                log.ip_address,
+                log.created_at,
+            ]
+        )
+
+    output = si.getvalue()
+    si.close()
+
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=audit_logs.csv"},
     )
 
 
