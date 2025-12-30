@@ -27,13 +27,26 @@
 /* HEADER */
 .eg_header,
 .eg_topbar {
-  grid-column: 1 / -1;
+    grid-column: 1 / -1;
     height: 60px;
     background: var(--primary);
     color: var(--text-dark);
     display: flex;
     align-items: center;
-    padding: 0 16px;
+    padding: 0 20px;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+.eg_topbarBrand {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-dark);
+  letter-spacing: 0.3px;
+}
+
+.eg_topbarRight {
+  display: flex;
+  align-items: center;
 }
 
 .eg_logo {
@@ -56,6 +69,11 @@
 .eg_userEmail {
     font-size: 14px;
     opacity: 0.8;
+    background-color: rgba(255, 255, 255, 0.35);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 500;
+    color: var(--text-dark);
 }
 
 /* SIDEBAR */
@@ -69,13 +87,35 @@
 .eg_sidebarNav{
   display: flex;
   flex-direction: column;
+  padding-top: 8px;
 }
 
+/* LOGO STYLING */
+.eg_sidebarHeader {
+  padding: 20px 16px 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.eg_logoImage {
+  max-width: 130px;
+  width: 100%;
+  height: 80px;
+  object-fit: contain;
+}
+.eg_sidebarHeaderDivider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.15);
+  margin: 0 16px 12px;
+}
 .eg_navItem {
   padding: 14px 20px;
   color: var(--text-dark);
   text-decoration: none;
   font-size: 15px;
+  border-radius: 8px;
+  margin: 2px 8px;
 }
 
 .eg_navItem:hover {
@@ -155,27 +195,67 @@
   transition: background 0.2s ease, transform 0.1s ease;
 }
 
+.eg_btn:disabled {
+  background: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
+}
+
 .eg_btnOn {
-  background: #4caf50;
-  color: white;
+  background: linear-gradient(135deg, #4caf50, #43a047);
+  color: #fff;
 }
 
 .eg_btnOff {
-  background: #e53935;
-  color: white;
+  background: linear-gradient(135deg, #e53935, #d32f2f);
+  color: #fff;
 }
 
-.eg_btn:hover {
+.eg_btn:hover:not(:disabled) {
   transform: translateY(-1px);
-  opacity: 0.9;
+  filter: brightness(1.05);
 }
 
-.eg_btnGroup {
+.eg_btnLarge {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-weight: 600;
   display: flex;
-  gap: 12px;
-  margin-top: 12px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
+.eg_controlCard {
+  border-left: 6px solid var(--primary);
+}
+
+.eg_controlGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.eg_controlHint {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.eg_controlLocked {
+  margin-top: 14px;
+  padding: 14px;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px dashed rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  font-size: 14px;
+  text-align: center;
+}
 .eg_menuBtn {
   display: none;
 }
@@ -241,12 +321,175 @@
   opacity: 0.85;
 }
 
+.eg_tableCard {
+  max-width: 100%;
+}
+
+.eg_logAction {
+  max-width: 360px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.eg_filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.eg_filterSelect,
+.eg_filterInput {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.eg_filterInput {
+  min-width: 200px;
+}
+
+
 .eg_btnPrimary {
   background: var(--primary);
   color: var(--text-dark);
   margin-bottom: 12px;
   display: inline-block;
 }
+/* DASHBOARD */
+.eg_pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.eg_pageTitle {
+  font-size: 22px;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+}
+
+.eg_pageSub {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.eg_statusPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.eg_pill {
+  background: rgba(163, 163, 194, 0.35);
+  color: var(--text-dark);
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.eg_pillOk {
+  background: rgba(76, 175, 80, 0.18);
+  border-color: rgba(76, 175, 80, 0.25);
+}
+
+.eg_pillWarn {
+  background: rgba(229, 57, 53, 0.14);
+  border-color: rgba(229, 57, 53, 0.22);
+}
+
+.eg_statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.eg_statCard {
+  background: var(--bg-card);
+  border-radius: 14px;
+  box-shadow: var(--shadow-soft);
+  padding: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.eg_statCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+.eg_statTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.eg_statLabel {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.eg_statValue {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+}
+
+.eg_statHint {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.eg_badge {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.10);
+  background: rgba(0,0,0,0.04);
+}
+
+.eg_badgeOk {
+  background: rgba(76, 175, 80, 0.18);
+  border-color: rgba(76, 175, 80, 0.25);
+}
+
+.eg_badgeNeutral {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.10);
+}
+
+.eg_cardTitle {
+  margin-bottom: 6px;
+}
+
+.eg_cardSub {
+  font-size: 14px;
+  opacity: 0.85;
+  margin-bottom: 12px;
+}
+
+
+/* RESPONSIVE DASHBOARD */
+@media (max-width: 1100px) {
+  .eg_statsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
@@ -272,5 +515,32 @@
 
   .eg_sidebarOpen {
     transform: translateX(0);
+  }
+  .eg_pageHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .eg_statusPills {
+    justify-content: flex-start;
+  }
+
+  .eg_statsGrid {
+    grid-template-columns: 1fr;
+  }
+   .eg_controlGrid {
+    grid-template-columns: 1fr;
+  }
+  .eg_table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .eg_topbarBrand {
+    font-size: 16px;
+  }
+
+  .eg_userEmail {
+    font-size: 13px;
   }
 }
