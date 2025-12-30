@@ -90,8 +90,8 @@ class SensorDataListener(SubscribeCallback):
 
 
 # start PubNub listener
-pubnub.add_listener(SensorDataListener())
-pubnub.subscribe().channels("home-automation-sensor-data").execute()
+client.add_listener(SensorDataListener())
+client.subscribe().channels("home-automation-sensor-data").execute()
 
 
 @app.route("/")
