@@ -23,7 +23,7 @@ from pubnub.pnconfiguration import PNConfiguration
 from pubnub.pubnub import PubNub
 from pubnub.callbacks import SubscribeCallback
 from functools import wraps
-from pubnub_access import generate_user_token
+from pubnub_access import generate_user_token, get_server_pubnub
 from models import SensorLog
 from utils.audit import log_action
 from models import AuditLog
@@ -59,14 +59,14 @@ db.init_app(app)
 latest_data = {}
 
 # PubNub configuration
-pnconfig = PNConfiguration()
-pnconfig.publish_key = PUBLISH_KEY
-pnconfig.subscribe_key = SUBSCRIBE_KEY
-pnconfig.uuid = "home-automation-server"
+# pnconfig = PNConfiguration()
+# pnconfig.publish_key = PUBLISH_KEY
+# pnconfig.subscribe_key = SUBSCRIBE_KEY
+# pnconfig.uuid = "home-automation-server"
 
-pubnub = PubNub(pnconfig)
-
-pubnub.set_token(os.getenv("PUBNUB_SERVER_TOKEN"))
+client = get_server_pubnub()
+if not client:
+    abort(503, description="Messaging service unavailable")
 
 
 class SensorDataListener(SubscribeCallback):
@@ -90,13 +90,25 @@ class SensorDataListener(SubscribeCallback):
 
 
 # start PubNub listener
-pubnub.add_listener(SensorDataListener())
-pubnub.subscribe().channels("home-automation-sensor-data").execute()
+client.add_listener(SensorDataListener())
+client.subscribe().channels("home-automation-sensor-data").execute()
 
 
 @app.route("/")
+def index():
+    if not current_user.is_authenticated:
+        return redirect(url_for("login"))
+    return redirect(url_for("dashboard"))
+
+
+@app.route("/dashboard")
+@login_required
 def dashboard():
-    return render_template("dashboard.html", data=latest_data, server_time=time.time())
+    return render_template(
+        "dashboard.html",
+        data=latest_data,
+        server_time=time.time(),
+    )
 
 
 def admin_required(f):
