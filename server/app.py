@@ -30,6 +30,7 @@ from models import AuditLog
 import csv
 from io import StringIO
 import time
+from utils.validation import is_valid_email, is_valid_password
 
 
 # Load environment variables
@@ -195,18 +196,39 @@ def login():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        email = request.form["email"]
+        full_name = request.form["full_name"].strip()
+        username = request.form["username"].strip()
+        email = request.form["email"].strip()
         password = request.form["password"]
+        confirm_password = request.form["confirm_password"]
 
-        existing_user = User.query.filter_by(email=email).first()
-        if existing_user:
+        if not is_valid_email(email):
+            return "Invalid email format", 400
+
+        if password != confirm_password:
+            return "Passwords do not match", 400
+
+        if not is_valid_password(password):
+            return (
+                "Password must be at least 8 characters long and include "
+                "uppercase, lowercase, number, and special character",
+                400,
+            )
+
+        if User.query.filter_by(email=email).first():
             return "Email already registered", 400
 
-        new_user = User(email=email)
-        new_user.set_password(password)
-        new_user.role = "user"  # default role
+        if User.query.filter_by(username=username).first():
+            return "Username already taken", 400
 
-        db.session.add(new_user)
+        user = User(
+            full_name=full_name,
+            username=username,
+            email=email,
+        )
+        user.set_password(password)
+
+        db.session.add(user)
         db.session.commit()
 
         return redirect(url_for("login"))
