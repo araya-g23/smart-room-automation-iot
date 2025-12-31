@@ -1,21 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Register</title>
+    <meta charset="UTF-8" />
+    <title>Register | AutoSmart</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
   </head>
-  <body>
-    <h2>Register</h2>
 
-    <form method="POST">
-      <label>Email:</label><br />
-      <input type="email" name="email" required /><br /><br />
+  <body class="eg_loginPage">
+    <div class="eg_loginWrapper">
+      <!-- LEFT PANEL -->
+      <div class="eg_loginLeft">
+        <img
+          src="{{ url_for('static', filename='images/logo.png') }}"
+          alt="AutoSmart Logo"
+          class="eg_loginLogo"
+        />
+        <h1>Create your account</h1>
+        <p class="eg_loginSub">
+          Register to access smart room monitoring and device control.
+        </p>
 
-      <label>Password:</label><br />
-      <input type="password" name="password" required /><br /><br />
+        <ul class="eg_loginFeatures">
+          <li>✔ Secure access control</li>
+          <li>✔ Real-time monitoring</li>
+          <li>✔ Full activity auditing</li>
+        </ul>
+      </div>
 
-      <button type="submit">Register</button>
-    </form>
+      <!-- RIGHT PANEL -->
+      <div class="eg_loginRight">
+        <h2>Register</h2>
 
-    <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+        <form method="POST" class="eg_loginForm">
+          <label>Full name</label>
+          <input type="text" name="full_name" required />
+
+          <label>Username</label>
+          <input type="text" name="username" required />
+
+          <label>Email</label>
+          <input type="email" name="email" required />
+
+          <label>Password</label>
+          <input type="password" name="password" required />
+
+          <label>Confirm password</label>
+          <input type="password" name="confirm_password" required />
+
+          <button type="submit" class="eg_btn eg_btnPrimary eg_btnLarge">
+            Register
+          </button>
+
+          <p class="eg_loginFooter">
+            Already have an account?
+            <a href="{{ url_for('login') }}">Login</a>
+          </p>
+        </form>
+      </div>
+    </div>
   </body>
 </html>
