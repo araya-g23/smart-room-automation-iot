@@ -1,12 +1,56 @@
 <!DOCTYPE html>
-<html>
-  <body>
-    <h2>Login</h2>
-    <form method="post">
-      <input type="email" name="email" required /><br /><br />
-      <input type="password" name="password" required /><br /><br />
-      <button type="submit">Login</button>
-      <p>No account? <a href="{{ url_for('register') }}">Register</a></p>
-    </form>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login | AutoSmart</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+  </head>
+  <body class="eg_loginPage">
+    <div class="eg_loginWrapper">
+      <!-- LEFT PANEL -->
+      <div class="eg_loginLeft">
+        <img
+          src="{{ url_for('static', filename='images/logo.png') }}"
+          alt="AutoSmart Logo"
+          class="eg_loginLogo"
+        />
+        <h1>Welcome back</h1>
+        <p class="eg_loginSub">
+          Sign in to manage rooms, monitor sensors, and control smart devices
+          securely.
+        </p>
+
+        <ul class="eg_loginFeatures">
+          <li>✔ Real time sensor monitoring</li>
+          <li>✔ Secure device control</li>
+          <li>✔ Full audit logging</li>
+        </ul>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="eg_loginRight">
+        <h2>Access your account</h2>
+
+        <form method="post" class="eg_loginForm">
+          <label>Email</label>
+          <input type="email" name="email" required />
+
+          <label>Password</label>
+          <input type="password" name="password" required />
+
+          <button type="submit" class="eg_btn eg_btnPrimary eg_btnLarge">
+            Log in
+          </button>
+
+          <p class="eg_loginFooter">
+            No account?
+            <a href="{{ url_for('register') }}">Register</a>
+          </p>
+        </form>
+      </div>
+    </div>
   </body>
 </html>
