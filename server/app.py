@@ -297,6 +297,9 @@ def register():
         db.session.add(user)
         db.session.commit()
 
+        log_action("user registered", user=user)
+        flash("Registration successful. Please log in.", "success")
+
         return redirect(url_for("login"))
 
     return render_template("register.html")
@@ -499,6 +502,111 @@ def toggle_user_subscription(user_id):
 def admin_users():
     users = User.query.all()
     return render_template("admin_users.html", users=users)
+
+
+@app.route("/admin/users/add", methods=["POST"])
+@login_required
+@admin_required
+def admin_add_user():
+    email = request.form["email"].strip()
+    full_name = request.form["full_name"].strip()
+    role = request.form["role"]
+    password = request.form["password"]
+
+    if not is_valid_email(email):
+        flash("Invalid email format", "error")
+        return redirect(url_for("admin_users"))
+
+    if User.query.filter_by(email=email).first():
+        flash("User already exists", "error")
+        return redirect(url_for("admin_users"))
+
+    user = User(
+        email=email,
+        full_name=full_name,
+        username=email.split("@")[0],
+        role=role,
+        is_subscribed=(role == "admin"),
+    )
+    user.set_password(password)
+
+    db.session.add(user)
+    db.session.commit()
+
+    log_action(f"Admin created user {email}")
+
+    flash("User created successfully", "success")
+    return redirect(url_for("admin_users"))
+
+
+@app.route("/admin/users/delete/<int:user_id>", methods=["POST"])
+@login_required
+@admin_required
+def admin_delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+
+    if user.role == "admin":
+        flash("Admin accounts cannot be deleted", "error")
+        return redirect(url_for("admin_users"))
+
+    db.session.delete(user)
+    db.session.commit()
+
+    log_action(f"Admin deleted user {user.email}")
+
+    flash("User deleted successfully", "success")
+    return redirect(url_for("admin_users"))
+
+
+@app.route("/settings/profile", methods=["POST"])
+@login_required
+def update_profile():
+    full_name = request.form["full_name"].strip()
+    email = request.form["email"].strip()
+
+    if not is_valid_email(email):
+        flash("Invalid email format", "error")
+        return redirect(url_for("settings"))
+
+    existing = User.query.filter(
+        User.email == email, User.id != current_user.id
+    ).first()
+    if existing:
+        flash("Email already in use", "error")
+        return redirect(url_for("settings"))
+
+    current_user.full_name = full_name
+    current_user.email = email
+    db.session.commit()
+
+    log_action("Updated profile details")
+    flash("Profile updated successfully", "success")
+    return redirect(url_for("settings"))
+
+
+@app.route("/settings/password", methods=["POST"])
+@login_required
+def change_password():
+    current = request.form["current_password"]
+    new = request.form["new_password"]
+
+    if not current_user.check_password(current):
+        flash("Current password is incorrect", "error")
+        return redirect(url_for("settings"))
+
+    if not is_valid_password(new):
+        flash(
+            "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.",
+            "error",
+        )
+        return redirect(url_for("settings"))
+
+    current_user.set_password(new)
+    db.session.commit()
+
+    log_action("Changed account password")
+    flash("Password updated successfully", "success")
+    return redirect(url_for("settings"))
 
 
 @app.route("/logout")

@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='images/favicon.png') }}"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="{{ url_for('static', filename='images/favicon.png') }}"
+    />
+
     <meta charset="UTF-8" />
     <title>{% block title %}Smart Room{% endblock %}</title>
 
@@ -63,7 +72,7 @@
           <a href="{{ url_for('admin_users') }}" class="eg_navItem">Users</a>
           {% endif %}
 
-          <a href="#" class="eg_navItem"> Subscriptions </a>
+          <!-- <a href="#" class="eg_navItem"> Subscriptions </a> -->
           {% endif %}
 
           <div class="eg_divider"></div>

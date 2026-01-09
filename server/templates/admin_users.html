@@ -1,39 +1,120 @@
 {% extends "base.html" %} {% block title %}User Management{% endblock %} {%
 block content %}
-<h2>User Management</h2>
 
-<table class="eg_table">
-  <thead>
-    <tr>
-      <th>Email</th>
-      <th>Role</th>
-      <th>Subscribed</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for user in users %}
-    <tr>
-      <td>{{ user.email }}</td>
-      <td>{{ user.role }}</td>
-      <td>
-        {% if user.is_subscribed or user.role == "admin" %} ✅ Active {% else %}
-        ❌ Inactive {% endif %}
-      </td>
-      <td>
-        {% if user.role != "admin" %}
-        <form
-          method="POST"
-          action="{{ url_for('toggle_user_subscription', user_id=user.id) }}"
-        >
-          <button class="eg_btn">
-            {% if user.is_subscribed %} Disable {% else %} Enable {% endif %}
-          </button>
-        </form>
-        {% else %} — {% endif %}
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="eg_pageHeader">
+  <div>
+    <h2 class="eg_pageTitle">User Management</h2>
+    <p class="eg_pageSub">Manage system users, roles, and subscriptions.</p>
+  </div>
+</div>
+
+<!-- ADD USER CARD -->
+<div class="eg_card eg_addUserCard">
+  <h3 class="eg_cardTitle">Add New User</h3>
+
+  <form
+    method="POST"
+    action="{{ url_for('admin_add_user') }}"
+    class="eg_addUserForm"
+  >
+    <div class="eg_formGroup">
+      <label for="full_name">Full Name</label>
+      <input
+        type="text"
+        id="full_name"
+        name="full_name"
+        placeholder="John Doe"
+        required
+      />
+    </div>
+
+    <div class="eg_formGroup">
+      <label for="email">Email</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        placeholder="user@example.com"
+        required
+      />
+    </div>
+
+    <div class="eg_formGroup">
+      <label for="password">Temporary Password</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        placeholder="••••••••"
+        required
+      />
+    </div>
+
+    <div class="eg_formGroup">
+      <label for="role">Role</label>
+      <select id="role" name="role">
+        <option value="user">User</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+
+    <div class="eg_formActions">
+      <button type="submit" class="eg_btn eg_btnPrimary">Create User</button>
+    </div>
+  </form>
+</div>
+
+<!-- USERS TABLE -->
+<div class="eg_card eg_tableCard">
+  <table class="eg_table">
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Subscription</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>
+          <span class="eg_emailBadge">{{ user.email }}</span>
+        </td>
+
+        <td>{{ user.role }}</td>
+
+        <td>
+          {% if user.is_subscribed or user.role == "admin" %} ✅ Active {% else
+          %} ❌ Inactive {% endif %}
+        </td>
+
+        <td style="display: flex; gap: 8px">
+          {% if user.role != "admin" %}
+          <!-- TOGGLE SUBSCRIPTION -->
+          <form
+            method="POST"
+            action="{{ url_for('toggle_user_subscription', user_id=user.id) }}"
+          >
+            <button class="eg_btn">
+              {% if user.is_subscribed %} Disable {% else %} Enable {% endif %}
+            </button>
+          </form>
+
+          <!-- DELETE USER -->
+          <form
+            method="POST"
+            action="{{ url_for('admin_delete_user', user_id=user.id) }}"
+            onsubmit="return confirm('Delete this user?')"
+          >
+            <button class="eg_btn eg_btnDanger">Delete</button>
+          </form>
+          {% else %} — {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
 {% endblock %}
