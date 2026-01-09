@@ -584,6 +584,51 @@
 .eg_loginFooter a:hover {
   text-decoration: underline;
 }
+/* AUTH DIVIDER */
+.eg_authDivider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.eg_authDivider::before,
+.eg_authDivider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #ccc;
+}
+
+/* GOOGLE LOGIN BUTTON */
+.eg_googleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.eg_googleBtn img {
+  width: 18px;
+  height: 18px;
+}
+
+.eg_googleBtn:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
 /* RESPONSIVE DASHBOARD */
 @media (max-width: 1100px) {
   .eg_statsGrid {

@@ -237,7 +237,10 @@ def google_callback():
         db.session.add(user)
         db.session.commit()
 
+        log_action("New user registered via Google OAuth")
+
     login_user(user)
+    log_action("User logged in via Google OAuth")
     return redirect(url_for("dashboard"))
 
 
