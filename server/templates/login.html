@@ -8,6 +8,25 @@
       href="{{ url_for('static', filename='css/main.css') }}"
     />
   </head>
+  <script>
+    // Auto-hide flash messages after 4 seconds
+    setTimeout(() => {
+      const flashes = document.querySelectorAll(".eg_flash");
+      flashes.forEach((flash) => {
+        flash.style.opacity = "0";
+        flash.style.transform = "translateY(-6px)";
+        setTimeout(() => flash.remove(), 300);
+      });
+    }, 4000);
+
+    function eg_closeFlash(button) {
+      const flash = button.parentElement;
+      flash.style.opacity = "0";
+      flash.style.transform = "translateY(-6px)";
+      setTimeout(() => flash.remove(), 300);
+    }
+  </script>
+
   <body class="eg_loginPage">
     <div class="eg_loginWrapper">
       <!-- LEFT PANEL -->
@@ -32,6 +51,17 @@
 
       <!-- RIGHT PANEL -->
       <div class="eg_loginRight">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %}
+        <div class="eg_flashContainer">
+          {% for category, message in messages %}
+          <div class="eg_flash eg_flash{{ category|capitalize }}">
+            {{ message }}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %}
+
         <h2>Access your account</h2>
 
         <form method="post" class="eg_loginForm">

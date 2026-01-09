@@ -637,7 +637,81 @@
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
   transform: translateY(-1px);
 }
+/* FLASH MESSAGES */
+.eg_flashContainer {
+  padding-top: 12px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
 
+.eg_flash {
+  width: 50%;
+  min-width: 420px;
+  max-width: 640px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-soft);
+  animation: eg_flashSlide 0.3s ease;
+}
+
+.eg_flashError {
+  background: rgba(229, 57, 53, 0.18);
+  border-left: 5px solid #e53935;
+  color: #b71c1c;
+}
+
+.eg_flashSuccess {
+  background: rgba(76, 175, 80, 0.2);
+  border-left: 5px solid #4caf50;
+  color: #2e7d32;
+}
+
+.eg_flashWarning {
+  background: rgba(255, 193, 7, 0.25);
+  border-left: 5px solid #ffc107;
+  color: #8d6e00;
+}
+
+.eg_flashInfo {
+  background: rgba(33, 150, 243, 0.18);
+  border-left: 5px solid #2196f3;
+  color: #0d47a1;
+}
+
+.eg_flashClose {
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+}
+
+.eg_flashClose:hover {
+  opacity: 1;
+}
+
+
+/* ANIMATION */
+@keyframes eg_flashSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 /* RESPONSIVE DASHBOARD */
 @media (max-width: 1100px) {
   .eg_statsGrid {

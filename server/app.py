@@ -36,6 +36,7 @@ from authlib.integrations.flask_client import OAuth
 from flask_login import login_user
 import secrets
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import flash
 
 
 # Load environment variables
@@ -131,7 +132,8 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or current_user.role != "admin":
-            abort(403)
+            flash("Admin access required", "error")
+            return redirect(url_for("dashboard"))
         return f(*args, **kwargs)
 
     return decorated_function
@@ -141,7 +143,8 @@ def control_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
-            abort(403)
+            flash("Please log in to access this page.", "error")
+            return redirect(url_for("login"))
 
         if current_user.role == "admin":
             return f(*args, **kwargs)
@@ -150,7 +153,11 @@ def control_required(f):
         if getattr(current_user, "is_subscribed", False):
             return f(*args, **kwargs)
 
-        abort(403)
+        flash(
+            "Control access requires an active subscription. Please contact the administrator.",
+            "error",
+        )
+        return redirect(url_for("dashboard"))
 
     return decorated_function
 
@@ -200,10 +207,13 @@ def login():
             login_user(user)
             token = generate_user_token(user.id, user.role, user.is_subscribed)
             session["pubnub_token"] = token
+            flash("Logged in successfully", "success")
             log_action("User logged in")
             return redirect(url_for("dashboard"))
 
-        return "Invalid login", 401
+        flash("Invalid email or password", "error")
+        # log_action("Failed login attempt")
+        return render_template("login.html"), 401
 
     return render_template("login.html")
 
@@ -255,23 +265,27 @@ def register():
         confirm_password = request.form["confirm_password"]
 
         if not is_valid_email(email):
-            return "Invalid email format", 400
+            flash("Invalid email format", "error")
+            return render_template("register.html"), 400
 
         if password != confirm_password:
-            return "Passwords do not match", 400
+            flash("Passwords do not match", "error")
+            return render_template("register.html"), 400
 
         if not is_valid_password(password):
-            return (
-                "Password must be at least 8 characters long and include "
-                "uppercase, lowercase, number, and special character",
-                400,
+            flash(
+                "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.",
+                "error",
             )
+            return render_template("register.html"), 400
 
         if User.query.filter_by(email=email).first():
-            return "Email already registered", 400
+            flash("Email already registered", "error")
+            return render_template("register.html"), 400
 
         if User.query.filter_by(username=username).first():
-            return "Username already taken", 400
+            flash("Username already taken", "error")
+            return render_template("register.html"), 400
 
         user = User(
             full_name=full_name,
@@ -292,7 +306,8 @@ def register():
 @login_required
 def grant_pubnub_access(user_id):
     if current_user.role != "admin":
-        return "Forbidden", 403
+        flash("Admin access required", "error")
+        return redirect(url_for("dashboard"))
 
     user = User.query.get_or_404(user_id)
     token = generate_user_token(is_admin=(user.role == "admin"))
@@ -473,6 +488,7 @@ def toggle_user_subscription(user_id):
     log_action(
         f"Subscription {'enabled' if user.is_subscribed else 'disabled'} for {user.email}"
     )
+    flash("User subscription status updated", "success")
 
     return redirect(url_for("admin_users"))
 
@@ -489,6 +505,7 @@ def admin_users():
 @login_required
 def logout():
     log_action("User logged out")
+    flash("Logged out successfully", "success")
     logout_user()
     return redirect(url_for("login"))
 

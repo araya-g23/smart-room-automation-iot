@@ -11,6 +11,25 @@
       href="{{ url_for('static', filename='css/main.css') }}"
     />
   </head>
+  <script>
+    // Auto-hide flash messages after 4 seconds
+    setTimeout(() => {
+      const flashes = document.querySelectorAll(".eg_flash");
+      flashes.forEach((flash) => {
+        flash.style.opacity = "0";
+        flash.style.transform = "translateY(-6px)";
+        setTimeout(() => flash.remove(), 300);
+      });
+    }, 4000);
+
+    function eg_closeFlash(button) {
+      const flash = button.parentElement;
+      flash.style.opacity = "0";
+      flash.style.transform = "translateY(-6px)";
+      setTimeout(() => flash.remove(), 300);
+    }
+  </script>
+
   <body>
     <div class="eg_appLayout">
       <!-- Sidebar -->
@@ -75,6 +94,25 @@
           </div>
           {% endif %}
         </header>
+
+        <!-- FLASH MESSAGES -->
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %}
+        <div class="eg_flashContainer" id="eg_flashContainer">
+          {% for category, message in messages %}
+          <div class="eg_flash eg_flash{{ category|capitalize }}">
+            <span>{{ message }}</span>
+            <button
+              type="button"
+              class="eg_flashClose"
+              onclick="eg_closeFlash(this)"
+            >
+              ×
+            </button>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %}
 
         <main class="eg_content">{% block content %}{% endblock %}</main>
       </div>
