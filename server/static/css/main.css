@@ -637,11 +637,157 @@
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
   transform: translateY(-1px);
 }
+/* FLASH MESSAGES */
+.eg_flashContainer {
+  padding-top: 12px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
 
+.eg_flash {
+  width: 50%;
+  min-width: 420px;
+  max-width: 640px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-soft);
+  animation: eg_flashSlide 0.3s ease;
+}
+
+.eg_flashError {
+  background: rgba(229, 57, 53, 0.18);
+  border-left: 5px solid #e53935;
+  color: #b71c1c;
+}
+
+.eg_flashSuccess {
+  background: rgba(76, 175, 80, 0.2);
+  border-left: 5px solid #4caf50;
+  color: #2e7d32;
+}
+
+.eg_flashWarning {
+  background: rgba(255, 193, 7, 0.25);
+  border-left: 5px solid #ffc107;
+  color: #8d6e00;
+}
+
+.eg_flashInfo {
+  background: rgba(33, 150, 243, 0.18);
+  border-left: 5px solid #2196f3;
+  color: #0d47a1;
+}
+
+.eg_flashClose {
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+}
+
+.eg_flashClose:hover {
+  opacity: 1;
+}
+.eg_btnDanger {
+  background: #e53935;
+  color: #fff;
+}
+
+.eg_btnDanger:hover {
+  filter: brightness(1.05);
+}
+
+.eg_addUserCard {
+  margin-bottom: 24px;
+  max-width: 900px;
+}
+
+.eg_addUserForm {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  align-items: end;
+}
+
+.eg_formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.eg_formGroup label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+}
+
+.eg_formGroup input,
+.eg_formGroup select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.eg_formActions {
+  grid-column: span 4;
+  margin-top: 8px;
+}
+
+.eg_accountSummary {
+  display: flex;
+  gap: 40px;
+  font-size: 14px;
+}
+
+.eg_settingsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 24px;
+}
+.eg_helpText {
+  font-size: 12px;
+  color: #666;
+}
+.eg_btnFull {
+  width: 100%;
+  margin-top: 12px;;
+}
+
+/* ANIMATION */
+@keyframes eg_flashSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 /* RESPONSIVE DASHBOARD */
 @media (max-width: 1100px) {
   .eg_statsGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .eg_settingsGrid {
+    grid-template-columns: 1fr;
+  }
+   .eg_accountSummary {
+    flex-direction: column;
+    gap: 8px;
   }
 }
 
@@ -704,5 +850,20 @@
 
   .eg_loginLeft {
     display: none;
+  }
+  .eg_addUserCard {
+    max-width: 100%;
+  }
+
+  .eg_addUserForm {
+    grid-template-columns: 1fr;
+  }
+
+  .eg_formActions {
+    grid-column: span 1;
+  }
+
+  .eg_formActions button {
+    width: 100%;
   }
 }
