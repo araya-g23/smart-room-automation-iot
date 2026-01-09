@@ -31,6 +31,10 @@ import csv
 from io import StringIO
 import time
 from utils.validation import is_valid_email, is_valid_password
+from authlib.integrations.flask_client import OAuth
+from flask_login import login_user
+import secrets
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 # Load environment variables
@@ -68,6 +72,16 @@ latest_data = {}
 client = get_server_pubnub()
 if not client:
     abort(503, description="Messaging service unavailable")
+
+oauth = OAuth(app)
+
+google = oauth.register(
+    name="google",
+    client_id=os.getenv("GOOGLE_CLIENT_ID"),
+    client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={"scope": "openid email profile"},
+)
 
 
 class SensorDataListener(SubscribeCallback):
@@ -191,6 +205,43 @@ def login():
         return "Invalid login", 401
 
     return render_template("login.html")
+
+
+@app.route("/login/google")
+def login_google():
+    redirect_uri = url_for("google_callback", _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+
+@app.route("/login/google/callback")
+def google_callback():
+    token = google.authorize_access_token()
+    user_info = token["userinfo"]
+
+    email = user_info["email"]
+    full_name = user_info.get("name", "")
+    username = email.split("@")[0]
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        random_password = secrets.token_urlsafe(32)
+        user = User(
+            full_name=full_name,
+            username=username,
+            email=email,
+            role="user",
+            is_subscribed=False,
+        )
+        user.password_hash = generate_password_hash(random_password)
+        db.session.add(user)
+        db.session.commit()
+
+        log_action("New user registered via Google OAuth")
+
+    login_user(user)
+    log_action("User logged in via Google OAuth")
+    return redirect(url_for("dashboard"))
 
 
 @app.route("/register", methods=["GET", "POST"])
