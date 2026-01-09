@@ -333,6 +333,15 @@
   font-weight: 500;
   white-space: nowrap;
 }
+.eg_emailBadge {
+  background: rgba(26, 115, 232, 0.1);
+  color: #1a73e8;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
 
 .eg_filterBar {
   display: flex;
