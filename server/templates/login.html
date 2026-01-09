@@ -45,6 +45,12 @@
             Log in
           </button>
 
+          <div style="margin-top: 16px; text-align: center">
+            <a href="{{ url_for('login_google') }}" class="eg_btn eg_btnLarge">
+              Continue with Google
+            </a>
+          </div>
+
           <p class="eg_loginFooter">
             No account?
             <a href="{{ url_for('register') }}">Register</a>
