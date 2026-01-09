@@ -51,7 +51,13 @@ content %}
       {% for log in logs %}
       <tr>
         <td>{{ log.id }}</td>
-        <td>{{ log.user_id or "—" }}</td>
+        <td>
+          {% if log.user %}
+            <span class="eg_emailBadge">{{ log.user.email }}</span>
+          {% else %}  
+            — 
+          {% endif %}
+        </td>
         <td>{{ log.role or "—" }}</td>
         <td class="eg_logAction">
           {% if "Google" in log.action %}

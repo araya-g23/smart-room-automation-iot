@@ -27,11 +27,13 @@ class AuditLog(db.Model):
     __tablename__ = "audit_logs"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     action = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(50))
     ip_address = db.Column(db.String(45))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    user = db.relationship("User", backref="audit_logs")
 
 
 class SensorLog(db.Model):

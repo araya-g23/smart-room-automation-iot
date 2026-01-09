@@ -27,6 +27,7 @@ from pubnub_access import generate_user_token, get_server_pubnub
 from models import SensorLog
 from utils.audit import log_action
 from models import AuditLog
+from sqlalchemy.orm import joinedload
 import csv
 from io import StringIO
 import time
@@ -333,7 +334,7 @@ def admin_audit_logs():
     role = request.args.get("role", "")
     action = request.args.get("action", "")
 
-    query = AuditLog.query
+    query = AuditLog.query.options(joinedload(AuditLog.user))
 
     if role:
         query = query.filter(AuditLog.role == role)
