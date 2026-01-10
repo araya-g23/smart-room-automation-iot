@@ -18,7 +18,7 @@ def get_pubnub_admin():
     pnconfig.publish_key = os.getenv("PUBNUB_PUBLISH_KEY")
     pnconfig.subscribe_key = os.getenv("PUBNUB_SUBSCRIBE_KEY")
     pnconfig.secret_key = os.getenv("PUBNUB_SECRET_KEY")
-    pnconfig.uuid = "server-auth"
+    pnconfig.uuid = "home-automation-server"
     return PubNub(pnconfig)
 
 
@@ -88,7 +88,7 @@ def generate_pi_token():
     envelope = (
         pubnub.grant_token()
         .authorized_uuid("raspberry-pi-01")
-        .ttl(1440)  # 24 hours
+        .ttl(43200)  # 30 days
         .channels(
             [
                 Channel.id("home-automation-sensor-data").write(),
