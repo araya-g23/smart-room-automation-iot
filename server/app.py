@@ -103,6 +103,16 @@ class SensorDataListener(SubscribeCallback):
                     humidity=message.message.get("humidity"),
                 )
                 db.session.add(log)
+
+                event = message.message.get("event")
+                if event:
+                    audit = AuditLog(
+                        user_id=None,
+                        role="device",
+                        action=event,
+                        ip_address="raspberry-pi",
+                    )
+                    db.session.add(audit)
                 db.session.commit()
 
 

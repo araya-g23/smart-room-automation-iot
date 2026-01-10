@@ -76,6 +76,8 @@ content %}
             🚪 {{ log.action }}
           {% elif "Light turned ON" in log.action %}
             💡 {{ log.action }}
+          {% elif log.role == "device" %}
+  🖲️           {{ log.action }}
           {% elif "Light turned OFF" in log.action %}
             🌙 {{ log.action }}
           {% elif "Subscription enabled" in log.action %}
