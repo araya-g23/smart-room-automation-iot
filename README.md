@@ -72,4 +72,4 @@ All communication is secured using PubNub Access Manager tokens and server-side 
 
 ## 👤 Author
 
-**Eyob Gebreidan**
+**Eyob Gebrekidan**
