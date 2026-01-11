@@ -1,0 +1,3 @@
+website - https://www.autosmart.live
+
+GitHub repo - https://github.com/araya-g23/smart-room-automation-iot
